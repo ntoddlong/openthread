@@ -30,6 +30,7 @@
 #include <openthread-core-config.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <openthread/config.h>
 
@@ -111,6 +112,92 @@ struct log_data_event {
   uint8_t eventData[9];
 };
 
+void parse_data(FILE* file) {
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), file)) {
+    char* token;
+    token = strtok(buffer, " \n");
+    printf("=====================================\n");
+    printf("token: \"%s\"\n", token);
+    printf("=====================================\n");
+    if (!strcmp(token, "\"Brief\":")) {
+      continue;
+    }
+    if (!strcmp(token, "\"Name\":")) {
+      token = strtok(NULL, " ");
+      printf("Name: %s\n", token);
+    }
+    if (!strcmp(token, "\"Type\":")) {
+      token = strtok(NULL, " ");
+      printf("Type: %s\n", token);
+    }
+  }
+}
+
+void parse_module(FILE* file) {
+  printf("in parse_module\n");
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), file)) {
+    char* token;
+    token = strtok(buffer, " ");
+    if (!strcmp(token, "\"Brief\":")) {
+      continue;
+    }
+    if (!strcmp(token, "\"Name\":")) {
+      token = strtok(NULL, " ");
+      printf("Name: %s\n", token);
+    }
+    if (!strcmp(token, "\"Value\":")) {
+      token = strtok(NULL, " ");
+      printf("Value: %ld\n", strtol(token, NULL, 10));
+    }
+    if (!strcmp(token, "\"DataLength\":")) {
+      token = strtok(NULL, " ");
+      printf("DataLength: %ld\n", strtol(token, NULL, 10));
+    }
+    if (!strcmp(token, "\"Data\":")) {
+      token = strtok(NULL, " ,");
+      if (strcmp(token, "null")) {
+        parse_data(file);
+      }
+    }
+    if (!strcmp(token, "\"SaveToNvMem\":")) {
+      token = strtok(NULL, " ");
+      printf("SaveToNvMem: %s\n", token);
+    }
+    if (!strcmp(token, "\"Type\":")) {
+      token = strtok(NULL, " ");
+      printf("Type: %s\n", token);
+    }
+    if (!strcmp(token, "]")) {
+      printf("hit ]\n");
+    }
+  }
+}
+
+void parse_modules(FILE* file) {
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), file)) {
+    char* token;
+    token = strtok(buffer, " ");
+    if (!strcmp(token, "\"ModuleEvents\":")) {
+      parse_module(file);
+      break;
+    }
+    if (!strcmp(token, "\"Brief\":")) {
+      continue;
+    }
+    if (!strcmp(token, "\"ModuleName\":")) {
+      token = strtok(NULL, " ");
+      printf("Module name: %s\n", token);
+    }
+    if (!strcmp(token, "\"Value\":")) {
+      token = strtok(NULL, " ");
+      printf("Module Value: %ld\n", strtol(token, NULL, 10));
+    }
+  }
+}
+
 int read_file(const char *path) {
   FILE* file;
   file = fopen(path, "r");
@@ -120,8 +207,22 @@ int read_file(const char *path) {
   }
 
   char buffer[256];
+  int start = 0;
+  int curr = 0;
+  int max = 0;
   while (fgets(buffer, sizeof(buffer), file)) {
-    printf("buffer: %s\n", buffer);
+    //// getting max line len, 230
+    //curr = ftell(file);
+    //max = max > (curr - start) ? max : (curr - start);
+    //start = curr;
+
+    char* token;
+    token = strtok(buffer, " ");
+    if (!strcmp(token, "\"Modules\":")) {
+      printf("modules\n");
+      parse_modules(file);
+      break;
+    }
   }
 
   if (ferror(file)) {
@@ -129,6 +230,7 @@ int read_file(const char *path) {
     clearerr(file);
   }
   fclose(file);
+  //printf("max buf len: %d\n", max);
 }
 
 int main(int argc, char *argv[])
