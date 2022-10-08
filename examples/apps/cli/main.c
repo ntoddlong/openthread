@@ -117,25 +117,22 @@ void parse_data(FILE* file) {
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
     token = strtok(buffer, " \n");
-    printf("=====================================\n");
-    printf("token: \"%s\"\n", token);
-    printf("=====================================\n");
     if (!strcmp(token, "\"Brief\":")) {
       continue;
     }
     if (!strcmp(token, "\"Name\":")) {
       token = strtok(NULL, " ");
-      printf("Name: %s\n", token);
+      printf("DATA ----Name: %s\n", token);
     }
     if (!strcmp(token, "\"Type\":")) {
       token = strtok(NULL, " ");
-      printf("Type: %s\n", token);
+      printf("DATA ----Type: %s\n", token);
     }
+    if (!strcmp(token, "],")) break;
   }
 }
 
 void parse_module(FILE* file) {
-  printf("in parse_module\n");
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
@@ -169,8 +166,8 @@ void parse_module(FILE* file) {
       token = strtok(NULL, " ");
       printf("Type: %s\n", token);
     }
-    if (!strcmp(token, "]")) {
-      printf("hit ]\n");
+    if (!strcmp(token, "],")) {
+      printf("\n\nhit ], should create next message\n\n");
     }
   }
 }
@@ -182,7 +179,6 @@ void parse_modules(FILE* file) {
     token = strtok(buffer, " ");
     if (!strcmp(token, "\"ModuleEvents\":")) {
       parse_module(file);
-      break;
     }
     if (!strcmp(token, "\"Brief\":")) {
       continue;
@@ -195,6 +191,7 @@ void parse_modules(FILE* file) {
       token = strtok(NULL, " ");
       printf("Module Value: %ld\n", strtol(token, NULL, 10));
     }
+    if (!strcmp(token, "],")) break;
   }
 }
 
