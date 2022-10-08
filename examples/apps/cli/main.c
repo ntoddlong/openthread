@@ -100,7 +100,7 @@ static const otCliCommand kCommands[] = {
 
 struct log_event {
   uint32_t timePoweredUp;
-  uint32_t moduleId;
+  uint8_t moduleId;
   uint8_t moduleEventId;
 };
 
@@ -112,7 +112,12 @@ struct log_data_event {
   uint8_t eventData[9];
 };
 
-void parse_data(FILE* file) {
+struct data_item {
+  char* name;
+  char* type;
+};
+
+void parse_data(FILE* file, struct log_data_event* lde) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
@@ -132,8 +137,14 @@ void parse_data(FILE* file) {
   }
 }
 
-void parse_module(FILE* file) {
+void parse_module(FILE* file, int module_id) {
   char buffer[256];
+  int le_index = 0;
+  int lde_index = 0;
+  int event_data_length = 0;
+  struct log_data_event* lde;
+  struct log_event* le = (struct log_event*)malloc(sizeof(struct log_event));
+  le->moduleId = module_id;
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
     token = strtok(buffer, " ");
@@ -149,6 +160,7 @@ void parse_module(FILE* file) {
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");
+      le->moduleEventId = strtol(token, NULL, 10);
       printf("Value: %ld\n", strtol(token, NULL, 10));
     }
     if (!strcmp(token, "\"DataLength\":")) {
@@ -158,7 +170,13 @@ void parse_module(FILE* file) {
     if (!strcmp(token, "\"Data\":")) {
       token = strtok(NULL, " ,");
       if (strcmp(token, "null")) {
-        parse_data(file);
+        lde = (struct log_data_event*)malloc(sizeof(struct log_data_event));
+        lde->timePoweredUp = le->timePoweredUp;
+        lde->moduleId = module_id;
+        lde->moduleEventId = le->moduleEventId;
+        lde->eventDataLength = event_data_length;
+        free(le);
+        parse_data(file, lde);
       }
     }
     if (!strcmp(token, "\"SaveToNvMem\":")) {
@@ -169,21 +187,15 @@ void parse_module(FILE* file) {
       token = strtok(NULL, " ");
       //printf("Type: %s\n", token);
     }
-    if (!strcmp(token, "],")) {
-      printf("\n\nhit ], should create next message\n\n");
-      break;
-    }
   }
 }
 
-void parse_modules(FILE* file) {
+void parse_modules(FILE* file, struct log_event* les[], struct log_data_event* ldes[]) {
   char buffer[256];
+  int module_id = 0;
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
     token = strtok(buffer, " ");
-    if (!strcmp(token, "\"ModuleEvents\":")) {
-      parse_module(file);
-    }
     if (!strcmp(token, "\"Brief\":")) {
       continue;
     }
@@ -193,13 +205,17 @@ void parse_modules(FILE* file) {
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");
+      module_id = strtol(token, NULL, 10);
       printf("Module Value: %ld\n", strtol(token, NULL, 10));
+    }
+    if (!strcmp(token, "\"ModuleEvents\":")) {
+      parse_module(file, module_id, les, ldes);
     }
     if (!strcmp(token, "],")) break;
   }
 }
 
-int read_file(const char *path) {
+int read_file(const char *path, struct log_event* les[], struct log_data_event* ldes[]) {
   FILE* file;
   file = fopen(path, "r");
   if (file == NULL) {
@@ -221,7 +237,7 @@ int read_file(const char *path) {
     token = strtok(buffer, " ");
     if (!strcmp(token, "\"Modules\":")) {
       printf("modules\n");
-      parse_modules(file);
+      parse_modules(file, les, ldes);
       break;
     }
   }
