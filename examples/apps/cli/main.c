@@ -30,6 +30,7 @@
 #include <openthread-core-config.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 #include <openthread/config.h>
 
 #include <openthread/cli.h>
@@ -110,9 +111,32 @@ struct log_data_event {
   uint8_t eventData[9];
 };
 
+int read_file(const char *path) {
+  FILE* file;
+  file = fopen(path, "r");
+  if (file == NULL) {
+    perror("read_file::fopen()");
+    return -1;
+  }
+
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), file)) {
+    printf("buffer: %s\n", buffer);
+  }
+
+  if (ferror(file)) {
+    perror("read_file::fgets()");
+    clearerr(file);
+  }
+  fclose(file);
+}
+
 int main(int argc, char *argv[])
 {
   printf("hey\n");
+  read_file("/home/nathaniel/event-structure-and-definition.txt");
+
+
     otInstance *instance;
 
     OT_SETUP_RESET_JUMP(argv);
