@@ -122,11 +122,11 @@ void parse_data(FILE* file) {
     }
     if (!strcmp(token, "\"Name\":")) {
       token = strtok(NULL, " ");
-      printf("DATA ----Name: %s\n", token);
+      //printf("DATA ----Name: %s\n", token);
     }
     if (!strcmp(token, "\"Type\":")) {
       token = strtok(NULL, " ");
-      printf("DATA ----Type: %s\n", token);
+      //printf("DATA ----Type: %s\n", token);
     }
     if (!strcmp(token, "],")) break;
   }
@@ -137,12 +137,15 @@ void parse_module(FILE* file) {
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
     token = strtok(buffer, " ");
+    if (!strcmp(token, "\"ModuleName\":")) {
+      break;
+    }
     if (!strcmp(token, "\"Brief\":")) {
       continue;
     }
     if (!strcmp(token, "\"Name\":")) {
       token = strtok(NULL, " ");
-      printf("Name: %s\n", token);
+      //printf("Name: %s\n", token);
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");
@@ -150,7 +153,7 @@ void parse_module(FILE* file) {
     }
     if (!strcmp(token, "\"DataLength\":")) {
       token = strtok(NULL, " ");
-      printf("DataLength: %ld\n", strtol(token, NULL, 10));
+      //printf("DataLength: %ld\n", strtol(token, NULL, 10));
     }
     if (!strcmp(token, "\"Data\":")) {
       token = strtok(NULL, " ,");
@@ -160,14 +163,15 @@ void parse_module(FILE* file) {
     }
     if (!strcmp(token, "\"SaveToNvMem\":")) {
       token = strtok(NULL, " ");
-      printf("SaveToNvMem: %s\n", token);
+      //printf("SaveToNvMem: %s\n", token);
     }
     if (!strcmp(token, "\"Type\":")) {
       token = strtok(NULL, " ");
-      printf("Type: %s\n", token);
+      //printf("Type: %s\n", token);
     }
     if (!strcmp(token, "],")) {
       printf("\n\nhit ], should create next message\n\n");
+      break;
     }
   }
 }
@@ -185,7 +189,7 @@ void parse_modules(FILE* file) {
     }
     if (!strcmp(token, "\"ModuleName\":")) {
       token = strtok(NULL, " ");
-      printf("Module name: %s\n", token);
+      //printf("Module name: %s\n", token);
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");
