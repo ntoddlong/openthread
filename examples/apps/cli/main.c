@@ -28,6 +28,8 @@
 
 #include <assert.h>
 #include <openthread-core-config.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <openthread/config.h>
 
 #include <openthread/cli.h>
@@ -94,8 +96,23 @@ static const otCliCommand kCommands[] = {
 };
 #endif // OPENTHREAD_POSIX && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 
+struct log_event {
+  uint32_t timePoweredUp;
+  uint32_t moduleId;
+  uint8_t moduleEventId;
+};
+
+struct log_data_event {
+  uint32_t timePoweredUp;
+  uint8_t moduleId;
+  uint8_t moduleEventId;
+  uint8_t eventDataLength;
+  uint8_t eventData[9];
+};
+
 int main(int argc, char *argv[])
 {
+  printf("hey\n");
     otInstance *instance;
 
     OT_SETUP_RESET_JUMP(argv);
