@@ -190,7 +190,7 @@ void parse_module(FILE* file, int module_id) {
   }
 }
 
-void parse_modules(FILE* file, struct log_event* les[], struct log_data_event* ldes[]) {
+void parse_modules(FILE* file) {
   char buffer[256];
   int module_id = 0;
   while (fgets(buffer, sizeof(buffer), file)) {
@@ -209,13 +209,13 @@ void parse_modules(FILE* file, struct log_event* les[], struct log_data_event* l
       printf("Module Value: %ld\n", strtol(token, NULL, 10));
     }
     if (!strcmp(token, "\"ModuleEvents\":")) {
-      parse_module(file, module_id, les, ldes);
+      parse_module(file, module_id);
     }
     if (!strcmp(token, "],")) break;
   }
 }
 
-int read_file(const char *path, struct log_event* les[], struct log_data_event* ldes[]) {
+int read_file(const char *path) {
   FILE* file;
   file = fopen(path, "r");
   if (file == NULL) {
@@ -237,7 +237,7 @@ int read_file(const char *path, struct log_event* les[], struct log_data_event* 
     token = strtok(buffer, " ");
     if (!strcmp(token, "\"Modules\":")) {
       printf("modules\n");
-      parse_modules(file, les, ldes);
+      parse_modules(file);
       break;
     }
   }
@@ -254,6 +254,7 @@ int main(int argc, char *argv[])
 {
   printf("hey\n");
   read_file("/home/nathaniel/event-structure-and-definition.txt");
+  
 
 
     otInstance *instance;
