@@ -189,6 +189,15 @@ exit:
     return error;
 }
 
+template <> otError Coap::Process<Cmd("send")>(Arg aArgs[])
+{
+    OT_UNUSED_VARIABLE(aArgs);
+    otError error = OT_ERROR_NONE;
+    printf("yay send\n");
+
+    return error;
+}
+
 template <> otError Coap::Process<Cmd("set")>(Arg aArgs[])
 {
 #if OPENTHREAD_CONFIG_COAP_OBSERVE_API_ENABLE
@@ -269,6 +278,20 @@ template <> otError Coap::Process<Cmd("stop")>(Arg aArgs[])
 
     return otCoapStop(GetInstancePtr());
 }
+
+//template <> otError Coap::Process<Cmd("send")>(Arg aArgs[])
+//{
+//  printf("send command process function\n");
+//    OT_UNUSED_VARIABLE(aArgs);
+//
+//#if OPENTHREAD_CONFIG_COAP_BLOCKWISE_TRANSFER_ENABLE
+//    otCoapRemoveBlockWiseResource(GetInstancePtr(), &mResource);
+//#else
+//    otCoapRemoveResource(GetInstancePtr(), &mResource);
+//#endif
+//
+//    return otCoapStop(GetInstancePtr());
+//}
 
 template <> otError Coap::Process<Cmd("parameters")>(Arg aArgs[])
 {
@@ -581,6 +604,7 @@ otError Coap::Process(Arg aArgs[])
         CmdEntry("post"),
         CmdEntry("put"),
         CmdEntry("resource"),
+        CmdEntry("send"),
         CmdEntry("set"),
         CmdEntry("start"),
         CmdEntry("stop"),

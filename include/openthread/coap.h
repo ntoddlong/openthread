@@ -95,6 +95,7 @@ typedef enum otCoapCode
     OT_COAP_CODE_POST   = OT_COAP_CODE(0, 2), ///< Post
     OT_COAP_CODE_PUT    = OT_COAP_CODE(0, 3), ///< Put
     OT_COAP_CODE_DELETE = OT_COAP_CODE(0, 4), ///< Delete
+    OT_COAP_CODE_SEND = OT_COAP_CODE(0, 5), ///< Send
 
     OT_COAP_CODE_RESPONSE_MIN = OT_COAP_CODE(2, 0),  ///< 2.00
     OT_COAP_CODE_CREATED      = OT_COAP_CODE(2, 1),  ///< Created
