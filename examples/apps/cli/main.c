@@ -98,26 +98,26 @@ static const otCliCommand kCommands[] = {
 };
 #endif // OPENTHREAD_POSIX && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)
 
-struct log_event {
+typedef struct {
   uint32_t timePoweredUp;
   uint8_t moduleId;
   uint8_t moduleEventId;
-};
+} log_event;
 
-struct log_data_event {
+typedef struct {
   uint32_t timePoweredUp;
   uint8_t moduleId;
   uint8_t moduleEventId;
   uint8_t eventDataLength;
   uint8_t eventData[9];
-};
+} log_data_event;
 
 struct data_item {
   char* name;
   char* type;
 };
 
-void parse_data(FILE* file, struct log_data_event* lde) {
+void parse_data(FILE* file, log_data_event* lde) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
@@ -142,8 +142,8 @@ void parse_module(FILE* file, int module_id) {
   int le_index = 0;
   int lde_index = 0;
   int event_data_length = 0;
-  struct log_data_event* lde;
-  struct log_event* le = (struct log_event*)malloc(sizeof(struct log_event));
+  log_data_event* lde;
+  log_event* le = (log_event*)malloc(sizeof(log_event));
   le->moduleId = module_id;
   while (fgets(buffer, sizeof(buffer), file)) {
     char* token;
@@ -170,7 +170,7 @@ void parse_module(FILE* file, int module_id) {
     if (!strcmp(token, "\"Data\":")) {
       token = strtok(NULL, " ,");
       if (strcmp(token, "null")) {
-        lde = (struct log_data_event*)malloc(sizeof(struct log_data_event));
+        lde = (log_data_event*)malloc(sizeof(log_data_event));
         lde->timePoweredUp = le->timePoweredUp;
         lde->moduleId = module_id;
         lde->moduleEventId = le->moduleEventId;
