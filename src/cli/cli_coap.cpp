@@ -197,7 +197,7 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
     otMessage *   message = nullptr;
     otMessageInfo messageInfo;
 
-    char         coapUri[kMaxUriLength] = "test";
+    char         coapUri[kMaxUriLength] = "data";
     otCoapType   coapType               = OT_COAP_TYPE_CONFIRMABLE;
     otIp6Address coapDestinationIp;
     otCoapBlockSzx coapBlockSize = OT_COAP_OPTION_BLOCK_SZX_1024;
