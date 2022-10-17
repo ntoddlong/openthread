@@ -189,6 +189,44 @@ exit:
     return error;
 }
 
+template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
+{
+    OT_UNUSED_VARIABLE(aArgs);
+
+    otError       error   = OT_ERROR_NONE;
+    otMessage *   message = nullptr;
+    otMessageInfo messageInfo;
+
+    char         coapUri[kMaxUriLength] = "test";
+    otCoapType   coapType               = OT_COAP_TYPE_CONFIRMABLE;
+    otIp6Address coapDestinationIp;
+    otCoapBlockSzx coapBlockSize = OT_COAP_OPTION_BLOCK_SZX_1024;
+
+    message = otCoapNewMessage(GetInstancePtr(), nullptr);
+    VerifyOrExit(message != nullptr, error = OT_ERROR_NO_BUFS);
+    otCoapMessageInit(message, coapType, OT_COAP_CODE_GET);
+    otCoapMessageGenerateToken(message, OT_COAP_DEFAULT_TOKEN_LENGTH);
+
+    SuccessOrExit(error = otCoapMessageAppendUriPathOptions(message, coapUri));
+
+    SuccessOrExit(error = otCoapMessageAppendBlock2Option(message, 0, false, coapBlockSize));
+
+    memset(&messageInfo, 0, sizeof(messageInfo));
+    messageInfo.mPeerAddr = coapDestinationIp;
+    messageInfo.mPeerPort = OT_DEFAULT_COAP_PORT;
+
+    error = otCoapSendRequestWithParameters(GetInstancePtr(), message, &messageInfo, &Coap::HandleResponse, this, GetRequestTxParameters());
+
+exit:
+
+    if ((error != OT_ERROR_NONE) && (message != nullptr))
+    {
+        otMessageFree(message);
+    }
+
+    return error;
+}
+
 template <> otError Coap::Process<Cmd("set")>(Arg aArgs[])
 {
 #if OPENTHREAD_CONFIG_COAP_OBSERVE_API_ENABLE
@@ -570,6 +608,7 @@ otError Coap::Process(Arg aArgs[])
 
     static constexpr Command kCommands[] = {
 #if OPENTHREAD_CONFIG_COAP_OBSERVE_API_ENABLE
+        CmdEntry("all"),
         CmdEntry("cancel"),
 #endif
         CmdEntry("delete"),
