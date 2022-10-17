@@ -32,6 +32,7 @@
  */
 
 #include "cli_coap.hpp"
+#include <openthread/thread_ftd.h>
 
 #if OPENTHREAD_CONFIG_COAP_API_ENABLE
 
@@ -192,47 +193,71 @@ exit:
 template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
 {
     OT_UNUSED_VARIABLE(aArgs);
-
     // get all ip's
     // this only gets child ip addresses
     // processor should have a table that stores all nodes in network
     // how to simulate?
-    otError otThreadGetChildNextIp6Address(
-        otInstance *aInstance,
-        uint16_t aChildIndex,
-        otChildIp6AddressIterator *aIterator,
-        otIp6Address *aAddress
-    )
-    otChildIp6AddressIterator *aIterator = OT_CHILD_IP6_ADDRESS_ITERATOR_INIT;
-    otError otThreadGetChildNextIp6Address(
-        GetInstancePtr(),
-        aIterator,
-        coapDestinationIp,
-    )
 
-    otError       error   = OT_ERROR_NONE;
-    otMessage *   message = nullptr;
-    otMessageInfo messageInfo;
+    otError                    error       = OT_ERROR_NONE;
+    // children information
+    otChildInfo                childInfo;
+    otIp6Address               ip6Address;
+    otIp6Address               coapDestinationIp;
+    uint16_t                   maxChildren = otThreadGetMaxAllowedChildren(GetInstancePtr());
+    otChildIp6AddressIterator  iterator    = OT_CHILD_IP6_ADDRESS_ITERATOR_INIT;
+    // message information
+    otMessage *                message     = nullptr;
+    otMessageInfo              messageInfo;
+    char                       coapUri[kMaxUriLength] = "data";
+    otCoapType                 coapType               = OT_COAP_TYPE_CONFIRMABLE;
+    otCoapBlockSzx             coapBlockSize          = OT_COAP_OPTION_BLOCK_SZX_1024;
 
-    char         coapUri[kMaxUriLength] = "data";
-    otCoapType   coapType               = OT_COAP_TYPE_CONFIRMABLE;
-    otIp6Address coapDestinationIp;
-    otCoapBlockSzx coapBlockSize = OT_COAP_OPTION_BLOCK_SZX_1024;
+    otNeighborInfoIterator niterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
+    otNeighborInfo         neighInfo;
+    while (otThreadGetNextNeighborInfo(GetInstancePtr(), &niterator, &neighInfo) == OT_ERROR_NONE) {
+      printf("ExtAddr: %s", neighInfo.mExtAddress.m8);
+      OutputFormat(", RLOC16:0x%04x", neighInfo.mRloc16);
+    }
 
-    message = otCoapNewMessage(GetInstancePtr(), nullptr);
-    VerifyOrExit(message != nullptr, error = OT_ERROR_NO_BUFS);
-    otCoapMessageInit(message, coapType, OT_COAP_CODE_GET);
-    otCoapMessageGenerateToken(message, OT_COAP_DEFAULT_TOKEN_LENGTH);
+    for (uint16_t childIndex = 0; childIndex < maxChildren; ++childIndex) {
+      OutputLine("getting child(%d) info", childIndex);
+      if ((otThreadGetChildInfoByIndex(GetInstancePtr(), childIndex, &childInfo) != OT_ERROR_NONE) || childInfo.mIsStateRestoring) {
+        if (childInfo.mChildId) {
+          OutputLine("Child: %d", childInfo.mChildId);
+        }
+        //continue;
+      }
 
-    SuccessOrExit(error = otCoapMessageAppendUriPathOptions(message, coapUri));
+      char ip6AddressString[OT_IP6_PREFIX_STRING_SIZE];
+      error = otThreadGetChildNextIp6Address(GetInstancePtr(), childIndex, &iterator, &ip6Address);
+      if (error == OT_ERROR_NONE) {
+        otIp6AddressToString(&ip6Address, ip6AddressString, sizeof(ip6AddressString));
+        OutputLine("Child: %d | IP: %s", childInfo.mRloc16, ip6AddressString);
+        error = otThreadGetChildNextIp6Address(GetInstancePtr(), childIndex, &iterator, &ip6Address);
+      }
+      if (error == OT_ERROR_NOT_FOUND) {
+        OutputLine("IP not found");
+      }
+    }
 
-    SuccessOrExit(error = otCoapMessageAppendBlock2Option(message, 0, false, coapBlockSize));
+    OutputLine("out of loop");
 
-    memset(&messageInfo, 0, sizeof(messageInfo));
-    messageInfo.mPeerAddr = coapDestinationIp;
-    messageInfo.mPeerPort = OT_DEFAULT_COAP_PORT;
+    if (0) {
+      message = otCoapNewMessage(GetInstancePtr(), nullptr);
+      VerifyOrExit(message != nullptr, error = OT_ERROR_NO_BUFS);
+      otCoapMessageInit(message, coapType, OT_COAP_CODE_GET);
+      otCoapMessageGenerateToken(message, OT_COAP_DEFAULT_TOKEN_LENGTH);
 
-    error = otCoapSendRequestWithParameters(GetInstancePtr(), message, &messageInfo, &Coap::HandleResponse, this, GetRequestTxParameters());
+      SuccessOrExit(error = otCoapMessageAppendUriPathOptions(message, coapUri));
+
+      SuccessOrExit(error = otCoapMessageAppendBlock2Option(message, 0, false, coapBlockSize));
+
+      memset(&messageInfo, 0, sizeof(messageInfo));
+      messageInfo.mPeerAddr = coapDestinationIp;
+      messageInfo.mPeerPort = OT_DEFAULT_COAP_PORT;
+
+      error = otCoapSendRequestWithParameters(GetInstancePtr(), message, &messageInfo, &Coap::HandleResponse, this, GetRequestTxParameters());
+    }
 
 exit:
 
