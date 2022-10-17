@@ -189,15 +189,6 @@ exit:
     return error;
 }
 
-template <> otError Coap::Process<Cmd("send")>(Arg aArgs[])
-{
-    OT_UNUSED_VARIABLE(aArgs);
-    otError error = OT_ERROR_NONE;
-    printf("\nyay send\n");
-
-    return error;
-}
-
 template <> otError Coap::Process<Cmd("set")>(Arg aArgs[])
 {
 #if OPENTHREAD_CONFIG_COAP_OBSERVE_API_ENABLE
