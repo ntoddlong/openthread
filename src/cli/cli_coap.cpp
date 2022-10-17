@@ -193,6 +193,23 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
 {
     OT_UNUSED_VARIABLE(aArgs);
 
+    // get all ip's
+    // this only gets child ip addresses
+    // processor should have a table that stores all nodes in network
+    // how to simulate?
+    otError otThreadGetChildNextIp6Address(
+        otInstance *aInstance,
+        uint16_t aChildIndex,
+        otChildIp6AddressIterator *aIterator,
+        otIp6Address *aAddress
+    )
+    otChildIp6AddressIterator *aIterator = OT_CHILD_IP6_ADDRESS_ITERATOR_INIT;
+    otError otThreadGetChildNextIp6Address(
+        GetInstancePtr(),
+        aIterator,
+        coapDestinationIp,
+    )
+
     otError       error   = OT_ERROR_NONE;
     otMessage *   message = nullptr;
     otMessageInfo messageInfo;
