@@ -33,6 +33,7 @@
 
 #include "cli_coap.hpp"
 #include <openthread/thread_ftd.h>
+#include <string>
 
 #if OPENTHREAD_CONFIG_COAP_API_ENABLE
 
@@ -203,7 +204,8 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
     otChildInfo                childInfo;
     otIp6Address               ip6Address;
     otIp6Address               coapDestinationIp;
-    uint16_t                   maxChildren = otThreadGetMaxAllowedChildren(GetInstancePtr());
+    //uint16_t                   maxChildren = otThreadGetMaxAllowedChildren(GetInstancePtr());
+    uint16_t                   maxChildren = 5;
     otChildIp6AddressIterator  iterator    = OT_CHILD_IP6_ADDRESS_ITERATOR_INIT;
     // message information
     otMessage *                message     = nullptr;
@@ -214,9 +216,12 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
 
     otNeighborInfoIterator niterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
     otNeighborInfo         neighInfo;
+
+    const uint8_t *prefix[8] = {otThreadGetMeshLocalPrefix(GetInstancePtr())->m8};
+    OutputLine("%02x%02x%02x%02x%02x%02x", prefix[0], prefix[1], prefix[2], prefix[3], prefix[4], prefix[5], prefix[6], prefix[7], prefix[8]);
     while (otThreadGetNextNeighborInfo(GetInstancePtr(), &niterator, &neighInfo) == OT_ERROR_NONE) {
-      printf("ExtAddr: %s", neighInfo.mExtAddress.m8);
-      OutputFormat(", RLOC16:0x%04x", neighInfo.mRloc16);
+      OutputLine(", RLOC16:0x%04x", neighInfo.mRloc16);
+      OutputLine("IP: %32x:0000:00ff:fe00:%04x", *prefix, neighInfo.mRloc16);
     }
 
     for (uint16_t childIndex = 0; childIndex < maxChildren; ++childIndex) {
