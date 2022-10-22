@@ -41,9 +41,13 @@ target_include_directories(openthread-cli-ftd PUBLIC ${OT_PUBLIC_INCLUDES} PRIVA
 
 target_sources(openthread-cli-ftd PRIVATE ${COMMON_SOURCES})
 
+# Locate the aws sdk for c++ package.
+find_package(AWSSDK REQUIRED COMPONENTS kinesis)
+
 target_link_libraries(openthread-cli-ftd
     PUBLIC
         openthread-ftd
+        ${AWSSDK_LINK_LIBRARIES}
     PRIVATE
         ${OT_MBEDTLS}
         ot-config-ftd
