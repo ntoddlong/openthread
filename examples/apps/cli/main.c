@@ -127,11 +127,11 @@ void parse_data(FILE* file, log_data_event* lde) {
     }
     if (!strcmp(token, "\"Name\":")) {
       token = strtok(NULL, " ");
-      //printf("DATA ----Name: %s\n", token);
+      printf("DATA ----Name: %s\n", token);
     }
     if (!strcmp(token, "\"Type\":")) {
       token = strtok(NULL, " ");
-      //printf("DATA ----Type: %s\n", token);
+      printf("DATA ----Type: %s\n", token);
     }
     if (!strcmp(token, "],")) break;
   }
@@ -156,7 +156,7 @@ void parse_module(FILE* file, int module_id) {
     }
     if (!strcmp(token, "\"Name\":")) {
       token = strtok(NULL, " ");
-      //printf("Name: %s\n", token);
+      printf("Name: %s\n", token);
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");
@@ -165,27 +165,27 @@ void parse_module(FILE* file, int module_id) {
     }
     if (!strcmp(token, "\"DataLength\":")) {
       token = strtok(NULL, " ");
-      //printf("DataLength: %ld\n", strtol(token, NULL, 10));
+      printf("DataLength: %ld\n", strtol(token, NULL, 10));
     }
     if (!strcmp(token, "\"Data\":")) {
       token = strtok(NULL, " ,");
       if (strcmp(token, "null")) {
-        lde = (log_data_event*)malloc(sizeof(log_data_event));
-        lde->timePoweredUp = le->timePoweredUp;
-        lde->moduleId = module_id;
-        lde->moduleEventId = le->moduleEventId;
-        lde->eventDataLength = event_data_length;
-        free(le);
+        //lde = (log_data_event*)malloc(sizeof(log_data_event));
+        //lde->timePoweredUp = le->timePoweredUp;
+        //lde->moduleId = module_id;
+        //lde->moduleEventId = le->moduleEventId;
+        //lde->eventDataLength = event_data_length;
+        //free(le);
         parse_data(file, lde);
       }
     }
     if (!strcmp(token, "\"SaveToNvMem\":")) {
       token = strtok(NULL, " ");
-      //printf("SaveToNvMem: %s\n", token);
+      printf("SaveToNvMem: %s\n", token);
     }
     if (!strcmp(token, "\"Type\":")) {
       token = strtok(NULL, " ");
-      //printf("Type: %s\n", token);
+      printf("Type: %s\n", token);
     }
   }
 }
@@ -201,7 +201,7 @@ void parse_modules(FILE* file) {
     }
     if (!strcmp(token, "\"ModuleName\":")) {
       token = strtok(NULL, " ");
-      //printf("Module name: %s\n", token);
+      printf("Module name: %s\n", token);
     }
     if (!strcmp(token, "\"Value\":")) {
       token = strtok(NULL, " ");

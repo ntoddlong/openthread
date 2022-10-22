@@ -581,7 +581,6 @@ otError Coap::Process(Arg aArgs[])
         CmdEntry("post"),
         CmdEntry("put"),
         CmdEntry("resource"),
-        CmdEntry("send"),
         CmdEntry("set"),
         CmdEntry("start"),
         CmdEntry("stop"),
