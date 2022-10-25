@@ -217,11 +217,13 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
     otNeighborInfoIterator niterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
     otNeighborInfo         neighInfo;
 
-    const uint8_t *prefix[8] = {otThreadGetMeshLocalPrefix(GetInstancePtr())->m8};
-    OutputLine("%02x%02x%02x%02x%02x%02x", prefix[0], prefix[1], prefix[2], prefix[3], prefix[4], prefix[5], prefix[6], prefix[7], prefix[8]);
+    //const uint8_t *prefix[8] = {otThreadGetMeshLocalPrefix(GetInstancePtr())->m8};
+    //OutputIp6PrefixLine(*otThreadGetMeshLocalPrefix(GetInstancePtr()));
+    OutputIp6AddressLine(*otThreadGetMeshLocalEid(GetInstancePtr()));
+    //OutputLine("%x%x%x%x%x%x%x%x", prefix[0], prefix[1], prefix[2], prefix[3], prefix[4], prefix[5], prefix[6], prefix[7]);
     while (otThreadGetNextNeighborInfo(GetInstancePtr(), &niterator, &neighInfo) == OT_ERROR_NONE) {
       OutputLine(", RLOC16:0x%04x", neighInfo.mRloc16);
-      OutputLine("IP: %32x:0000:00ff:fe00:%04x", *prefix, neighInfo.mRloc16);
+      //OutputLine("IP: %32x:0000:00ff:fe00:%04x", *prefix, neighInfo.mRloc16);
     }
 
     for (uint16_t childIndex = 0; childIndex < maxChildren; ++childIndex) {

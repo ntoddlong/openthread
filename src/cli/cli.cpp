@@ -33,23 +33,6 @@
 
 #include "cli.hpp"
 
-#include <aws/core/Region.h>
-#include <iostream>
-#include <random>
-#include <aws/core/Aws.h>
-#include <aws/core/utils/Outcome.h>
-#include <aws/kinesis/KinesisClient.h>
-#include <aws/kinesis/model/DescribeStreamRequest.h>
-#include <aws/kinesis/model/DescribeStreamResult.h>
-#include <aws/kinesis/model/GetRecordsRequest.h>
-#include <aws/kinesis/model/GetRecordsResult.h>
-#include <aws/kinesis/model/GetShardIteratorRequest.h>
-#include <aws/kinesis/model/GetShardIteratorResult.h>
-#include <aws/kinesis/model/Shard.h>
-#include <aws/kinesis/model/PutRecordsResult.h>
-#include <aws/kinesis/model/PutRecordsRequest.h>
-#include <aws/kinesis/model/PutRecordsRequestEntry.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
