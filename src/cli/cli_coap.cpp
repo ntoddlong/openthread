@@ -217,6 +217,11 @@ template <> otError Coap::Process<Cmd("all")>(Arg aArgs[])
     otNeighborInfoIterator niterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
     otNeighborInfo         neighInfo;
 
+    char string[OT_IP6_ADDRESS_STRING_SIZE];
+
+    otIp6AddressToString(otThreadGetMeshLocalEid(GetInstancePtr()), string, sizeof(string));
+
+    OutputFormat("%s", string);
     //const uint8_t *prefix[8] = {otThreadGetMeshLocalPrefix(GetInstancePtr())->m8};
     //OutputIp6PrefixLine(*otThreadGetMeshLocalPrefix(GetInstancePtr()));
     OutputIp6AddressLine(*otThreadGetMeshLocalEid(GetInstancePtr()));
