@@ -230,7 +230,7 @@ int read_file(const char *path) {
   while (fgets(buffer, sizeof(buffer), file)) {
     //// getting max line len, 230
     //curr = ftell(file);
-    //max = max > (curr - start) ? max : (curr - start);
+    //max = max >= (curr - start) ? max : (curr - start);
     //start = curr;
 
     char* token;
