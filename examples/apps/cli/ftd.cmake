@@ -33,6 +33,8 @@ add_executable(ot-cli-ftd
 
 target_include_directories(ot-cli-ftd PRIVATE ${COMMON_INCLUDES})
 
+find_library(CBOR tinycbor HINTS ${PROJECT_SOURCE_DIR}/custom/libs)
+
 if(NOT DEFINED OT_PLATFORM_LIB_FTD)
     set(OT_PLATFORM_LIB_FTD ${OT_PLATFORM_LIB})
 endif()
@@ -46,6 +48,7 @@ target_link_libraries(ot-cli-ftd PRIVATE
     ${OT_MBEDTLS}
     ot-config-ftd
     ot-config
+    ${CBOR}
 )
 
 install(TARGETS ot-cli-ftd

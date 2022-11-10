@@ -45,6 +45,8 @@
 
 #include "lib/platform/reset_util.h"
 
+#include "../../../custom/tinycbor/cbor.h"
+
 /**
  * This function initializes the CLI app.
  *
@@ -254,7 +256,34 @@ int main(int argc, char *argv[])
 {
   printf("hey\n");
   read_file("/home/nathaniel/event-structure-and-definition.txt");
-  
+  uint8_t buffer[78];
+  const char* s = "640096c8";
+  unsigned char data[9];
+  memcpy(data, s, sizeof(s));
+  printf("data buffer size: %lu\n", sizeof(data));
+  CborEncoder encoder, arrayEncoder;
+  cbor_encoder_init(&encoder, buffer, sizeof(buffer), 0);
+  cbor_encoder_create_array(&encoder, &arrayEncoder, 6);
+    // device_id
+    cbor_encode_int(&arrayEncoder, 0);
+    // time_power_up
+    cbor_encode_int(&arrayEncoder, 69420);
+    // module_id
+    cbor_encode_int(&arrayEncoder, 0);
+    // module_event_id
+    cbor_encode_int(&arrayEncoder, 0);
+    // module_type, 0/1 - info/error
+    cbor_encode_int(&arrayEncoder, 0);
+    // data
+    cbor_encode_byte_string(&arrayEncoder, data, sizeof(data));
+  cbor_encoder_close_container_checked(&encoder, &arrayEncoder);
+  printf("cbor buffer size: %lu\n", sizeof(buffer));
+  printf("cbor buffer size: %lu\n", cbor_encoder_get_buffer_size(&encoder, buffer));
+  printf("\n\n\n");
+  for (int i = 0; i < cbor_encoder_get_buffer_size(&encoder, buffer); i++) {
+    printf("%x-", buffer[i]);
+  }
+  printf("\n\n\n");
 
 
     otInstance *instance;
