@@ -41,6 +41,8 @@
 
 #include "cli/cli.hpp"
 
+#include <vector>
+
 namespace ot {
 namespace Cli {
 
@@ -758,8 +760,24 @@ void Coap::HandleRequest(otMessage *aMessage, const otMessageInfo *aMessageInfo)
             {
 #endif
                 SuccessOrExit(error = otCoapMessageSetPayloadMarker(responseMessage));
-                SuccessOrExit(error = otMessageAppend(responseMessage, mResourceContent,
-                                                      static_cast<uint16_t>(strlen(mResourceContent))));
+                //SuccessOrExit(error = otMessageAppend(responseMessage, mResourceContent,
+                 //                                     static_cast<uint16_t>(strlen(mResourceContent))));
+                FILE* file = fopen("/home/nathaniel/test.txt", "rb");
+                if (!file) printf("Error: could not open file \'/home/nathaniel/test.txt\'");
+
+                std::vector<uint8_t> b;
+                fseek(file, 0, SEEK_END);
+                long lSize = ftell(file);
+                rewind(file);
+                long result = fread(b.data(), sizeof(uint8_t), lSize, file);
+                if (result != lSize) {
+                  OutputLine("Error reading from file");
+                }
+                fclose(file);
+                for (auto byte : b) {
+                  OutputFormat("%c", byte);
+                }
+
 #if OPENTHREAD_CONFIG_COAP_BLOCKWISE_TRANSFER_ENABLE
             }
 #endif
